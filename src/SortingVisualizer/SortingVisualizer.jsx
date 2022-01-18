@@ -22,10 +22,19 @@ function SortingVisualizer(){
   
     var [array, setarray] = useState([]);
     var [arrSize,setArrSize] = useState(50);
-    var  [wid ,setWid] = useState(9);
-  
-
+    const [wid, setWid] = useState(10);
+    const [algo, setAlgo] = useState('bubbleSort')
+   
+    const [sorting, setSorting] = useState(false);
+    const [completed, setCompleted] = useState(false);
+    const handleAlgo = (event) => {
+      setAlgo(event.target.value)
+    }
+    
+    // for resetting the array
   const resetArray = ()=> {
+    setCompleted(false)
+		setSorting(false)
     const arr = [];
     for (let i = 0; i < arrSize; i++) {
      
@@ -33,9 +42,14 @@ function SortingVisualizer(){
     }
     setarray(arr);
     const arrayBars = document.getElementsByClassName("array-bar");
-    for (let i = 0; i < arrayBars.length; i++)
+    for (let i = 0; i < arrayBars.length; i++){
       arrayBars[i].style.backgroundColor = PRIMARY_COLOR;
+      arrayBars[i].style.width = wid;
+    }
+      
   };
+
+  // for doing the animations
     const animate = (animations) => {
       const arrayBars = document.getElementsByClassName("array-bar");
   
@@ -84,7 +98,7 @@ useEffect(() => {
 }, [])
 function setArrSizeHelper(val) {
 
-  console.log(val);
+ 
   if (val > 100) {
     setWid(2)
   }
@@ -116,33 +130,65 @@ function setArrSizeHelper(val) {
     setWid(60);
   }
 
-  setArrSize(val);
+
+  // setArrSize(val);
+  console.log(wid);
  resetArray();
+//  setArrSize(val);
 }
 function changeDelay(val) {
 	delay = val;
 }
- 
+
+const handleSort = () => { 
+  algo === 'bubbleSort' ?  handleBubbleSort(): 
+		algo === 'heapSort' ?   handleHeapSort() :
+		algo === 'mergeSort' ?  handleMergeSort() : 
+		algo === 'quickSort' ?   handleQuickSort(): (() => {
+			setSorting(false)
+			setCompleted(true)
+		})()
+}
+
     return (
-      <div className="Nav-bar">
-				<label className='sliderLabel'>
-					Array Size
-					<br />
+       
+
+      <div >
+      <nav>
+      <div className='nav-brand'>Sorting Visualizer</div>
+      <div className='toolbox'>
+      <div>
+      <div className='group length'>
+                        <label>Length</label>
 					<input id='rangeSlider' type='range' min='1' max='200' value={arrSize} onChange={(e) => setArrSizeHelper(e.target.value)} />
-				</label>
-        <label className='sliderLabel'>
-					Delay
+				</div>
+        <div className='group speed'>
+                        <label>Delay</label>
 					<input type='range' min='5' max='200' onChange={(e) => { changeDelay(e.target.value) }} />
-				</label>
-        
-           <button className='btn' onClick={resetArray}>Generate New Array</button>
-        <button className='btn' onClick={handleMergeSort}>Merge Sort</button>
-        <button className='btn' onClick={handleQuickSort}>Quick Sort</button>
-        <button className='btn' onClick={handleHeapSort}>Heap Sort</button>
-        <button className='btn' onClick={handleBubbleSort}>Bubble Sort</button>
+				</div>
+        <select >
+                        <option value='bubbleSort'>Bubble Sort</option>
+                        <option value='heapSort'>Heap Sort</option>
+                        <option value='mergeSort'>Merge Sort</option>
+                        <option value='quickSort'>Quick Sort</option>
+                    </select>
         <br/>
-         <div className="array-container">
+      </div>
+      <button onClick={handleSort} disabled={sorting || completed}>Sort</button>
+      <button onClick={resetArray} disabled={sorting || completed}>Reset</button>
+
+             
+      
+      </div>
+      </nav>
+      
+      
+			    
+        
+                <div className="array-container">
+              
         {array.map((value, idx) => (
+          
           <div
             className="array-bar"
             key={idx}
@@ -165,13 +211,4 @@ function randomIntFromInterval(min, max) {
   return Math.floor(Math.random() * (max - min + 1) + min);
 }
 
-function arraysAreEqual(arrayOne, arrayTwo) {
-  if (arrayOne.length !== arrayTwo.length) return false;
-  for (let i = 0; i < arrayOne.length; i++) {
-    if (arrayOne[i] !== arrayTwo[i]) {
-      return false;
-    }
-  }
-  return true;
-}
 export default SortingVisualizer;
